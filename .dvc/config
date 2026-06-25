@@ -1,0 +1,5 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = gs://lab21aiaction/dvc
+    credentialpath = D:\VinUni_AI_Action\Day21\lab21\Day21-Track2-CI-CD-for-AI-Systems\sa-key.json
