@@ -2,7 +2,7 @@ name: MLOps Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
     paths:
       - 'data/**.dvc'
       - 'src/**.py'
