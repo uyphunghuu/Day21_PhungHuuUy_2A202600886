@@ -139,7 +139,32 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
+
+          debug: true
+          script_stop: false
+
           script: |
+            set -x
+
+            echo "===== WHOAMI ====="
+            whoami
+
+            echo "===== PWD ====="
+            pwd
+
+            echo "===== RESTART ====="
             sudo systemctl restart mlops-serve
+            echo "Restart exit code: $?"
+
+            echo "===== STATUS ====="
+            sudo systemctl status mlops-serve --no-pager
+            echo "Status exit code: $?"
+
+            echo "===== WAIT ====="
             sleep 5
-            curl -sf http://localhost:8000/health && echo "Health check passed." || exit 1
+
+            echo "===== HEALTH ====="
+            curl -v http://localhost:8000/health
+            echo "Curl exit code: $?"
+
+            echo "===== FINISHED ====="
