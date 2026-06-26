@@ -63,7 +63,7 @@ jobs:
           echo "CLOUD_BUCKET=${{ secrets.CLOUD_BUCKET }}" >> $GITHUB_ENV
 
       - name: Pull data with DVC
-        run: dvc pull data/train_phase1.csv data/eval.csv
+        run: dvc pull data/train_phase1.csv data/train_phase2.csv data/eval.csv
 
       - name: Train model
         run: python src/train.py
@@ -79,11 +79,18 @@ jobs:
           python - <<'EOF'
           from google.cloud import storage
           import os
+          bucket_name = os.environ.get("CLOUD_BUCKET")
+          if not bucket_name:
+              raise EnvironmentError(
+                  "CLOUD_BUCKET is not set. "
+                  "Please add CLOUD_BUCKET as a GitHub Secret in: "
+                  "Settings → Secrets and variables → Actions."
+              )
           client = storage.Client()
-          bucket = client.bucket(os.environ["CLOUD_BUCKET"])
+          bucket = client.bucket(bucket_name)
           blob = bucket.blob("models/latest/model.pkl")
           blob.upload_from_filename("models/model.pkl")
-          print("Model uploaded to GCS")
+          print(f"Model uploaded to GCS bucket: {bucket_name}")
           EOF
 
       - name: Save metrics as artifact

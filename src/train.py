@@ -14,21 +14,30 @@ EVAL_THRESHOLD = 0.70
 def train(
     params: dict,
     data_path: str = "data/train_phase1.csv",
+    data_path2: str = "data/train_phase2.csv",
     eval_path: str = "data/eval.csv",
 ) -> float:
     """
     Huan luyen mo hinh va ghi nhan ket qua vao MLflow.
 
     Tham so:
-        params     : dict chua cac sieu tham so cho RandomForestClassifier.
-        data_path  : duong dan den file du lieu huan luyen.
-        eval_path  : duong dan den file du lieu danh gia.
+        params      : dict chua cac sieu tham so cho RandomForestClassifier.
+        data_path   : duong dan den file du lieu huan luyen phase 1.
+        data_path2  : duong dan den file du lieu huan luyen phase 2 (optional).
+        eval_path   : duong dan den file du lieu danh gia.
 
     Tra ve:
         accuracy (float): do chinh xac tren tap danh gia.
     """
-
-    df_train = pd.read_csv(data_path)
+    import os
+    df1 = pd.read_csv(data_path)
+    if os.path.exists(data_path2):
+        df2 = pd.read_csv(data_path2)
+        df_train = pd.concat([df1, df2], ignore_index=True)
+        print(f"Training with combined data: {len(df_train)} samples ({len(df1)} + {len(df2)})")
+    else:
+        df_train = df1
+        print(f"Training with phase1 only: {len(df_train)} samples")
     df_eval  = pd.read_csv(eval_path)
 
     X_train = df_train.drop(columns=["target"])
@@ -66,4 +75,4 @@ def train(
 if __name__ == "__main__":
     with open("params.yaml") as f:
         params = yaml.safe_load(f)
-    train(params)
+    train(params, data_path="data/train_phase1.csv", data_path2="data/train_phase2.csv")
